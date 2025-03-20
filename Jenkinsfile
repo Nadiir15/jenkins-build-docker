@@ -1,11 +1,18 @@
 node {
+    def app
+
     stage('Clone') {
-        git 'https://github.com/Nadiir15/jenkins-helloworld.git'
+        checkout scm
     }
-        stage('Build') {
-            sh label: '', script: 'javac Main.java'
+
+    stage('Build image') {
+        app = docker.build("nadir/nginx")
     }
-    stage('Run') {    
-        sh label: '', script: 'java Main'
+
+    stage('Test image') {
+        docker.image('nadir/nginx').withRun('-p 80:80') { c ->
+            sh 'docker ps'
+            sh 'curl localhost'
+        }
     }
 }
